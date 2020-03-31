@@ -1,0 +1,50 @@
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+// RAJOUTE
+#include <ESP8266WiFi.h> //de base??
+#include <BlynkSimpleEsp8266.h> //Blink by Volodymyr Shymanshkyy
+
+// Data wire is connected to GPIO15
+#define ONE_WIRE_BUS 15
+// Setup a oneWire instance to communicate with a OneWire device
+OneWire oneWire(ONE_WIRE_BUS);
+// Pass our oneWire reference to Dallas Temperature sensor 
+DallasTemperature sensors(&oneWire);
+//RAJOUTE
+char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+char ssid[] = "UPC7C77516";
+char pass[] = "xxxxxxxxxx";
+BlynkTimer timer;
+
+DeviceAddress sensor1 = { 0x28, 0x2A, 0xF9, 0x79, 0x97, 0x9, 0x3, 0xB };
+DeviceAddress sensor2 = { 0x28, 0xEF, 0x5C, 0x79, 0x97, 0x9, 0x3, 0x9E };
+
+//RAJOUTE
+void show_temp(void){
+    sensors.requestTemperatures();
+    int Capt1 = sensors.getTempC(sensor1);
+    int Capt2 = sensors.getTempC(sensor2);  
+}
+void sendSensor()
+{
+ sensors.requestTemperatures();
+ float Capt1 = sensors.getTempC(sensor1);
+ float Capt2 = sensors.getTempC(sensor2);
+ float Ecart1 = Capt1 - Capt2;
+ Blynk.virtualWrite(V7, Capt1);
+ Blynk.virtualWrite(V6, Capt2);
+ Blynk.virtualWrite(V8, Ecart1);
+ }
+
+void setup()
+{
+  sensors.begin();
+  Blynk.begin(auth, ssid, pass);
+  timer.setInterval(1000L, sendSensor);
+}
+
+void loop(){ 
+  Blynk.run();
+ timer.run();
+}
