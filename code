@@ -7,15 +7,19 @@
 
 // Data wire is connected to GPIO15
 #define ONE_WIRE_BUS 15
+#define RELAIS 14
+
+
 // Setup a oneWire instance to communicate with a OneWire device
 OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature sensor 
 DallasTemperature sensors(&oneWire);
 //RAJOUTE
-char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+char auth[] = "TKCVutFLMQRCcc3fky4VJ-0uepHy0Ltq";
 char ssid[] = "UPC7C77516";
-char pass[] = "xxxxxxxxxx";
+char pass[] = "dKk8xsvnye7y";
 BlynkTimer timer;
+
 
 DeviceAddress sensor1 = { 0x28, 0x2A, 0xF9, 0x79, 0x97, 0x9, 0x3, 0xB };
 DeviceAddress sensor2 = { 0x28, 0xEF, 0x5C, 0x79, 0x97, 0x9, 0x3, 0x9E };
@@ -39,12 +43,22 @@ void sendSensor()
 
 void setup()
 {
+  pinMode(RELAIS,OUTPUT);
   sensors.begin();
   Blynk.begin(auth, ssid, pass);
   timer.setInterval(1000L, sendSensor);
 }
 
 void loop(){ 
+ float Capt1 = sensors.getTempC(sensor1);
+ float Capt2 = sensors.getTempC(sensor2);
+ float Ecart1 = Capt1 - Capt2;
+  if (Ecart1 < 3) {
+  digitalWrite(RELAIS,HIGH);
+  }
+  else {
+  digitalWrite(RELAIS,LOW);
+  }
   Blynk.run();
  timer.run();
 }
