@@ -15,9 +15,9 @@ OneWire oneWire(ONE_WIRE_BUS);
 // Pass our oneWire reference to Dallas Temperature sensor 
 DallasTemperature sensors(&oneWire);
 //RAJOUTE
-char auth[] = "TKCVutFLMQRCcc3fky4VJ-0uepHy0Ltq";
+char auth[] = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
 char ssid[] = "UPC7C77516";
-char pass[] = "dKk8xsvnye7y";
+char pass[] = "xxxxxxxxxx";
 BlynkTimer timer;
 
 
