@@ -1,0 +1,115 @@
+#include <ESP8266WiFi.h> //de base??
+#include <BlynkSimpleEsp8266.h> //Blink by Volodymyr Shymanshkyy
+
+
+#include <OneWire.h> //OneWire by Paul Stoffregen
+#include <DallasTemperature.h> // Dallas Temperature by... a lots of guys!
+#define Relai 12
+#define Relais 14
+
+const int oneWireBus1 = 5;
+const int oneWireBus2 = 4;
+const int oneWireBus3 = 0;
+const int Relais1 = 14;
+const int Relais2 = 12;
+float consigneEcart1 = 3;
+float consigneEcart2 = 3;
+
+OneWire oneWire1(oneWireBus1);
+OneWire oneWire2(oneWireBus2);
+OneWire oneWire3(oneWireBus3);
+
+DallasTemperature sensors1(&oneWire1);
+DallasTemperature sensors2(&oneWire2);
+DallasTemperature sensors3(&oneWire3);
+
+
+char auth[] = "XdaBqgsPlFNT8hBmtyiuaI8B110Sf2Hq";
+char ssid[] = "UPC7C77516";
+char pass[] = "";
+BlynkTimer timer;
+// instanciation de l'ecran
+
+
+void show_temp(void){
+    sensors1.requestTemperatures();
+    int S1 = sensors1.getTempCByIndex(0);
+    
+    sensors2.requestTemperatures();
+    int S2 = sensors2.getTempCByIndex(0);
+
+    sensors3.requestTemperatures();
+    int S3 = sensors3.getTempCByIndex(0);
+    //for debugging, replace by  "display.drawString(0, 0, "pinV0: "+String(pinV0));
+   
+}
+void sendSensor1()
+{
+ sensors1.requestTemperatures();
+ float S1 = sensors1.getTempCByIndex(0);
+ Blynk.virtualWrite(V5, S1);
+ }
+ void sendSensor2()
+{
+ sensors2.requestTemperatures();
+ float S2 = sensors2.getTempCByIndex(0);
+ Blynk.virtualWrite(V6, S2);
+ }
+ void sendSensor3()
+{
+ sensors3.requestTemperatures();
+
+ float S3 = sensors3.getTempCByIndex(0);
+ 
+
+ Blynk.virtualWrite(V7, S3);
+ float S1 = sensors1.getTempCByIndex(0);
+ float S2 = sensors2.getTempCByIndex(0);
+ float Ecart1 = S3 - S2;
+ float Ecart2 = S1 - S2;
+ 
+ Blynk.virtualWrite(V8, Ecart1);
+ Blynk.virtualWrite(V9, Ecart2);
+ Blynk.virtualWrite(V15, consigneEcart1);
+
+ if (Ecart1 > 2) {
+  digitalWrite(Relai,LOW);
+}
+else {
+  digitalWrite(Relai,HIGH);
+}
+ if (Ecart2 > 2) {
+  digitalWrite(Relais,LOW);
+}
+else {
+  digitalWrite(Relais,HIGH);
+}
+ }
+void setup()
+{
+ pinMode(Relai,OUTPUT);
+ pinMode(Relais,OUTPUT);
+ // Start the DS18B20 sensor
+ sensors1.begin();
+ // initialisation de l'ecran
+
+ Blynk.begin(auth, ssid, pass);
+ timer.setInterval(1000L, sendSensor1);
+  timer.setInterval(1000L, sendSensor2);
+   timer.setInterval(1000L, sendSensor3);
+}   
+   BLYNK_WRITE(V15)
+{
+  consigneEcart1 = param.asFloat();    //On stock la valeur de consigne dans la variable consigneEcqrt1
+}
+
+   
+ 
+void loop()
+{
+
+
+
+ Blynk.run();
+ timer.run();
+}
