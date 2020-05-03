@@ -10,8 +10,6 @@
 const int oneWireBus1 = 5;
 const int oneWireBus2 = 4;
 const int oneWireBus3 = 0;
-const int Relais1 = 14;
-const int Relais2 = 12;
 float consigneEcart1 = 3;
 float consigneEcart2 = 3;
 
@@ -26,7 +24,7 @@ DallasTemperature sensors3(&oneWire3);
 
 char auth[] = "XdaBqgsPlFNT8hBmtyiuaI8B110Sf2Hq";
 char ssid[] = "UPC7C77516";
-char pass[] = "";
+char pass[] = "dKk8xsvnye7y";
 BlynkTimer timer;
 // instanciation de l'ecran
 
@@ -85,8 +83,27 @@ else {
   digitalWrite(Relais,HIGH);
 }
  }
+
+bool state = false;
+void toggle()
+{
+   Serial.print("Toggle state="); 
+   Serial.println(state);
+   if (state) {
+       digitalWrite(Relais,LOW);
+       state = false;
+   } else {
+       digitalWrite(Relais,HIGH);
+       state = true;
+   }
+}
+
+ 
 void setup()
 {
+   Serial.begin(115200);
+  Serial.println("\n\nHello world!");
+  
  pinMode(Relai,OUTPUT);
  pinMode(Relais,OUTPUT);
  // Start the DS18B20 sensor
@@ -97,6 +114,7 @@ void setup()
  timer.setInterval(1000L, sendSensor1);
   timer.setInterval(1000L, sendSensor2);
    timer.setInterval(1000L, sendSensor3);
+   timer.setInterval(1000L, toggle);
 }   
    BLYNK_WRITE(V15)
 {
